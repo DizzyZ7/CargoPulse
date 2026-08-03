@@ -1,0 +1,19 @@
+<Project Sdk="Aspire.AppHost.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <UserSecretsId>cargopulse-apphost-f3a79dc5-84c2-4a63-b0a1-36a75b6ecde8</UserSecretsId>
+    <!-- Aspire orchestration packages are selected for the SDK host RID; one lock file is not cross-platform. -->
+    <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CargoPulse.Api\CargoPulse.Api.csproj" />
+    <ProjectReference Include="..\CargoPulse.Worker\CargoPulse.Worker.csproj" />
+    <ProjectReference Include="..\CargoPulse.Web\CargoPulse.Web.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,43 @@
+# .NET build output
+**/bin/
+**/obj/
+artifacts/
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+coverage.*
+
+# IDEs and editors
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+_ReSharper*/
+*.DotSettings.user
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+.secrets/
+appsettings.Local.json
+secrets.json
+
+# Aspire and local orchestration
+.aspire/
+aspire-manifest.json
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.bak

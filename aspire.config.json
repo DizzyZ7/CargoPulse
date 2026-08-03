@@ -1,0 +1,5 @@
+{
+  "appHost": {
+    "path": "src/CargoPulse.AppHost/CargoPulse.AppHost.csproj"
+  }
+}

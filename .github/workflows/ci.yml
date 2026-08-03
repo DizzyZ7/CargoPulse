@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Restore, build, and test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Restore locked dependencies
+        run: dotnet restore CargoPulse.sln --locked-mode
+
+      - name: Verify formatting
+        run: dotnet format CargoPulse.sln --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build CargoPulse.sln --configuration Release --no-restore
+
+      - name: Run foundation smoke tests
+        run: >-
+          dotnet test CargoPulse.sln
+          --configuration Release
+          --no-build
+          --results-directory artifacts/test-results
+          --
+          --minimum-expected-tests 7
+          --report-xunit-trx
+          --report-xunit-trx-filename foundation.trx
+
+      - name: Upload failed test results
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: foundation-test-results
+          path: artifacts/test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+  dependency-audit:
+    name: Dependency audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Restore with transitive vulnerability audit
+        run: dotnet restore CargoPulse.sln --locked-mode -p:NuGetAudit=true -p:NuGetAuditMode=all
+
+      - name: List known vulnerable dependencies
+        run: dotnet package list --project CargoPulse.sln --include-transitive --vulnerable --no-restore
+
+  compose-validation:
+    name: Validate Compose configuration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      POSTGRES_PASSWORD: ci-only-postgres-secret
+      RABBITMQ_PASSWORD: ci-only-rabbitmq-secret
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate Docker Compose
+        run: docker compose config --quiet
+
+  container-build:
+    name: Build ${{ matrix.name }} container
+    needs: quality
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api
+            dockerfile: src/CargoPulse.Api/Dockerfile
+          - name: worker
+            dockerfile: src/CargoPulse.Worker/Dockerfile
+          - name: web
+            dockerfile: src/CargoPulse.Web/Dockerfile
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build image
+        run: docker build --pull --file "${{ matrix.dockerfile }}" --tag "cargopulse-${{ matrix.name }}:ci" .
+
+      - name: Verify non-root runtime user
+        shell: bash
+        run: |
+          image_user="$(docker image inspect --format '{{.Config.User}}' 'cargopulse-${{ matrix.name }}:ci')"
+          if [[ -z "$image_user" || "$image_user" == "root" || "$image_user" == "0" ]]; then
+            echo "Container runtime user must be explicitly non-root."
+            exit 1
+          fi

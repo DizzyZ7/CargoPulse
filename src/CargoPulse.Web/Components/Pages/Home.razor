@@ -1,0 +1,45 @@
+@page "/"
+
+<PageTitle>CargoPulse · Foundation</PageTitle>
+
+<section class="hero">
+    <p class="eyebrow">Production-oriented foundation</p>
+    <h1>The control tower has a reliable place to stand.</h1>
+    <p class="lede">
+        The API, background worker and Blazor host share health checks, structured logs,
+        trace propagation and service discovery. Shipment workflows are intentionally not
+        simulated before their domain model exists.
+    </p>
+</section>
+
+<section class="status-grid" aria-label="Foundation status">
+    <article>
+        <span class="status-dot" aria-hidden="true"></span>
+        <h2>API host</h2>
+        <p>Problem Details, OpenAPI, correlation IDs, rate limiting and readiness probes.</p>
+        <code>/health · /ready</code>
+    </article>
+    <article>
+        <span class="status-dot" aria-hidden="true"></span>
+        <h2>Worker host</h2>
+        <p>A separate restart-safe process boundary with a monitored heartbeat.</p>
+        <code>worker_heartbeat_timestamp_seconds</code>
+    </article>
+    <article>
+        <span class="status-dot" aria-hidden="true"></span>
+        <h2>Local infrastructure</h2>
+        <p>PostgreSQL and RabbitMQ are wired through Aspire or Docker Compose.</p>
+        <code>at-least-once planned · not exactly-once</code>
+    </article>
+</section>
+
+<section class="next-step">
+    <div>
+        <p class="eyebrow">Next milestone</p>
+        <h2>Carriers and shipments</h2>
+    </div>
+    <p>
+        Milestone 1 introduces the first domain aggregates, PostgreSQL migrations and the
+        shipment state machine. Until then, this screen reports foundation scope honestly.
+    </p>
+</section>
