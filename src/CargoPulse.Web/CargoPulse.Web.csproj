@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <!-- Windows injects this SDK package; Linux does not, and NuGet forbids central versions for implicit refs. -->
+    <PackageReference Include="Microsoft.AspNetCore.App.Internal.Assets"
+                      Condition="$([MSBuild]::IsOSPlatform('Windows')) != 'true'"
+                      PrivateAssets="all" />
+    <ProjectReference Include="..\CargoPulse.ServiceDefaults\CargoPulse.ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>
