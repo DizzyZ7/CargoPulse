@@ -14,7 +14,7 @@
     <!-- Linux needs an explicit static-assets reference; Windows receives the same version from the Web SDK. -->
     <PackageVersion Include="Microsoft.AspNetCore.App.Internal.Assets"
                     Condition="$([MSBuild]::IsOSPlatform('Windows')) != 'true'"
-                    Version="10.0.10" />
+                    Version="10.0.11" />
     <PackageVersion Include="Microsoft.OpenApi" Version="2.11.0" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.8.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.8.0" />
