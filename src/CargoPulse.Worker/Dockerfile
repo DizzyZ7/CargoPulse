@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0.302-noble AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0.400-noble AS build
 WORKDIR /source
 COPY global.json Directory.Build.props Directory.Packages.props .editorconfig ./
 COPY src/CargoPulse.ServiceDefaults/CargoPulse.ServiceDefaults.csproj src/CargoPulse.ServiceDefaults/packages.lock.json src/CargoPulse.ServiceDefaults/
