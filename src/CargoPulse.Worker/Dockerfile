@@ -12,7 +12,7 @@ RUN dotnet publish src/CargoPulse.Worker/CargoPulse.Worker.csproj \
     --output /app/publish \
     /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0.10-noble-chiseled-extra AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0.11-noble-chiseled-extra AS final
 WORKDIR /app
 ENV ASPNETCORE_HTTP_PORTS=8080 \
     DOTNET_EnableDiagnostics=0
